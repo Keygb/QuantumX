@@ -23,8 +23,8 @@ try {
     }
 
     // 3、微博热搜页面刷新
-    if (url.includes("/2/page?") &amp;&amp; resp_data.cards &amp;&amp; resp_data.cards[0].card_group) {
-      resp_data.cards[0].card_group = resp_data.cards[0].card_group.filter(group =&gt; group.promotion == null);
+    if (url.includes("/2/page?") && resp_data.cards && resp_data.cards[0].card_group) {
+      resp_data.cards[0].card_group = resp_data.cards[0].card_group.filter(group => group.promotion == null);
       console.log('处理微博热搜页面广告结束💕💕');
     }
 
@@ -34,17 +34,17 @@ try {
       resp_data.pageHeader = {};
       for (let subItem of resp_data.items) {
         if (subItem.itemId === "hotword") {
-          subItem.items = subItem.items.filter(group =&gt; group.data.promotion == null &amp;&amp; !group.data.itemid.includes("c_type:51")); 
+          subItem.items = subItem.items.filter(group => group.data.promotion == null && !group.data.itemid.includes("c_type:51")); 
           break;
         } else if (subItem.items) {
-          subItem.items = subItem.items.filter(group =&gt; group.data.promotion == null &amp;&amp; !group.data.itemid.includes("c_type:51"));
+          subItem.items = subItem.items.filter(group => group.data.promotion == null && !group.data.itemid.includes("c_type:51"));
         }
       }
     }
 
     // 4、微博超话页面
-    if (url.includes("/statuses/container_timeline_topicpage?") &amp;&amp; resp_data.items) {
-      resp_data.items = resp_data.items.filter(item =&gt; !item.data || item.data.mblogtypename !== "广告");
+    if (url.includes("/statuses/container_timeline_topicpage?") && resp_data.items) {
+      resp_data.items = resp_data.items.filter(item => !item.data || item.data.mblogtypename !== "广告");
       console.log('处理微博超话页面广告结束💕💕');
     }
 
@@ -70,7 +70,7 @@ try {
 
     // 7、话题页面 微博话题页面
     if (url.includes("/2/searchall?")) {
-      for (let i = 0; i &lt; resp_data.items.length; i++) {
+      for (let i = 0; i < resp_data.items.length; i++) {
         if (resp_data.items[i].data?.mblogtypename === "广告" || resp_data.items[i].data?.ad_state === 1) {
           console.log('处理话题页面广告');
           resp_data.items[i] = {};
@@ -80,7 +80,7 @@ try {
         }
 
         if (resp_data.items[i].items) {
-          for (let j = 0; j &lt; resp_data.items[i].items.length; j++) {
+          for (let j = 0; j < resp_data.items[i].items.length; j++) {
             if (resp_data.items[i].items[j].data?.card_type === 22
                 || resp_data.items[i].items[j].data?.ad_state === 1
                 || resp_data.items[i].items[j].data?.content_auth_info?.content_auth_title === "广告") {
@@ -98,7 +98,7 @@ try {
     if (url.includes("/statuses/container_timeline_topic?")) {
       let foundFeed = false;
       const cardTypes = [19, 179]; // 19：热帖/必刷/分类，31：热搜词，179：关注的超话
-      for (let i = 0; i &lt; resp_data.items.length; i++) {
+      for (let i = 0; i < resp_data.items.length; i++) {
         const item = resp_data.items[i];
         if (item.data?.is_ad === 1 || item.data?.mblogtypename === "广告") {
           resp_data.items[i] = {};
@@ -113,7 +113,7 @@ try {
         }
 
         // 第一条微博往下的内容只要不是微博（分类、推广等），全部删除
-        if (foundFeed &amp;&amp; category !== "feed") {
+        if (foundFeed && category !== "feed") {
           resp_data.items[i] = {};
         }
         if (category === "feed" || category === "card") {
@@ -123,7 +123,7 @@ try {
           }
         }
         if (item.items) {
-          for (let j = 0; j &lt; item.items.length; j++) {
+          for (let j = 0; j < item.items.length; j++) {
             const subItem = item.items[j];
             if (subItem.data?.card_type === 215) {
               item.items[j] = {};
@@ -162,7 +162,7 @@ function removeChannelsTabs(channels) {
   // 1001：发现，1015：趋势，1016：榜单
   const channelIds = [1001, 1015, 1016];
   // 反向遍历数组
-  for (let i = channels.length - 1; i &gt;= 0; i--) {
+  for (let i = channels.length - 1; i >= 0; i--) {
     if (!channelIds.includes(channels[i].id)) {
       // 如果当前元素的id不在channelIds中，则从原数组中删除该元素
       channels.splice(i, 1);
@@ -173,7 +173,7 @@ function removeChannelsTabs(channels) {
 
 function removeHeaderAds(headerItems) {
   removeCommonAds(headerItems);
-  for (let i = 0; i &lt; headerItems.length; i++) {
+  for (let i = 0; i < headerItems.length; i++) {
     if (headerItems[i].items) {
       removeCommonAds(headerItems[i].items);
     }
@@ -186,7 +186,7 @@ function removeCommonAds(items) {
   const cardTypes = [17, 101];
 
   let firstVerticalFound = false;
-  for (let i = 0; i &lt; items.length; i++) {
+  for (let i = 0; i < items.length; i++) {
     if (items[i].type === "vertical") {
       if (!firstVerticalFound) {
         firstVerticalFound = true;
@@ -200,7 +200,7 @@ function removeCommonAds(items) {
     const card_type = items[i].data?.card_type;
     console.log(`card_type = ${card_type}`);
     // 白名单模式
-    if (card_type &amp;&amp; !cardTypes.includes(card_type)) {
+    if (card_type && !cardTypes.includes(card_type)) {
       console.log(`移除多余的模块：${card_type}💕💕`);
       items[i] = {};
       continue;
@@ -218,7 +218,7 @@ function removeCommonAds(items) {
 function removeHotSearchAds(groups) {
   if (!groups) return;
   console.log('移除发现页热搜广告开始💕');
-  for (let i = groups.length - 1; i &gt;= 0; i--) {
+  for (let i = groups.length - 1; i >= 0; i--) {
     const group = groups[i];
     if (group.itemid?.includes("is_ad_pos") || group.itemid?.includes("cate_type:tongcheng") || group.promotion) {
       groups.splice(i, 1);
@@ -230,9 +230,9 @@ function removeHotSearchAds(groups) {
 // 移除“热搜微博”信息流的广告
 function removeCategoryFeedAds(items) {
   console.log('移除发现页热门微博广告💕');
-  for (let i = items.length - 1; i &gt;= 0; i--) {
+  for (let i = items.length - 1; i >= 0; i--) {
     const item = items[i];
-    if (item.category === "feed" &amp;&amp; item.data &amp;&amp; item.data.mblogtypename === "广告") {
+    if (item.category === "feed" && item.data && item.data.mblogtypename === "广告") {
       items.splice(i, 1);
     }
   }
@@ -241,7 +241,7 @@ function removeCategoryFeedAds(items) {
 // 移除微博首页的多余tab页
 function removePageDataAds(items) {
   console.log('移除微博首页的多余tab页💕');
-  for (let i = items.length - 1; i &gt;= 0; i--) {
+  for (let i = items.length - 1; i >= 0; i--) {
     const item = items[i];
     if (item.pageDataType === "homeExtend") {
       items.splice(i, 1);
