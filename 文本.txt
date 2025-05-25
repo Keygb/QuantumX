@@ -1,0 +1,12 @@
+// kuaishou_feed_filter.js
+
+try {
+  let obj = JSON.parse($response.body);
+  if (Array.isArray(obj.feeds)) {
+    obj.feeds = obj.feeds.filter(feed => !feed.ad);
+  }
+  $done({ body: JSON.stringify(obj) });
+} catch (e) {
+  console.log("Error filtering ads: " + e);
+  $done({});
+}
