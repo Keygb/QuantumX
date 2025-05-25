@@ -1,0 +1,35 @@
+const myRequest = {
+    url: url,
+    method: method,
+    headers: headers,
+    body: body
+};
+
+$task.fetch(myRequest).then(response => {
+    let body = response.body;
+    try {
+        let obj = JSON.parse(body);
+
+        // ✅ 关闭广告相关字段
+        if (obj.ad_enable !== undefined) obj.ad_enable = false;
+        if (obj.feed_ads) obj.feed_ads = [];
+        if (obj.modules?.banner) obj.modules.banner.enabled = false;
+
+        // ✅ 可添加更多字段清理
+        // if (obj.modules?.recommend) obj.modules.recommend.enabled = false;
+
+        body = JSON.stringify(obj);
+    } catch (e) {
+        console.log("❌ JSON 解析失败: ", e);
+    }
+
+    // ✅ 返回净化后的响应
+    $done({
+        status: response.status,
+        headers: response.headers,
+        body: body
+    });
+}, reason => {
+    console.log("请求失败: " + reason.error);
+    $done();
+});
