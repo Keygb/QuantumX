@@ -1,30 +1,18 @@
-// 18av.mm-cg.com 强化广告移除（v2）
 let body = $response.body;
-const url = $request.url;
 
-// 删除典型广告区块（含 class 和 id）
-const blockRules = [
-  /<div[^>]+class="sponsor"[\s\S]*?<\/div>/g,
-  /<div[^>]+class="adsbygoogle"[\s\S]*?<\/div>/g,
-  /<div[^>]+id="ad-top"[\s\S]*?<\/div>/g,
-  /<div[^>]+id="banner"[\s\S]*?<\/div>/g,
-  /<iframe[^>]*src="[^"]*ads[^"]*"[^>]*>[\s\S]*?<\/iframe>/g,
-  /<script[^>]+src="[^"]*googletagmanager[^"]*"[^>]*><\/script>[\s\S]*?<script>[\s\S]*?<\/script>/g,
-  /<script>[\s\S]*?(new Image\(\);.*?)<\/script>/g
-];
+// 删除广告图块
+body = body.replace(/<div class="di_img">[\s\S]*?<\/div>/g, '');
 
-blockRules.forEach(rule => {
-  body = body.replace(rule, '');
-});
+// 删除 footer
+body = body.replace(/<div class="footer">[\s\S]*?<\/div>/g, '');
 
-// 注入 CSS 进一步压缩间距
-body = body.replace('</head>', `<style>
-  .sponsor, .adsbygoogle, #ad-top, #banner, iframe[src*="ads"], .float-ad {
-    display: none !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-</style></head>`);
+// 删除 footer 相关脚本
+body = body.replace(/<script[^>]*footer_html_font_to_cn\.js[\s\S]*?<\/script>/g, '');
+
+// 删除所有 style="all: initial;" 的 div
+body = body.replace(/<div style="all: initial;">[\s\S]*?<\/div>/g, '');
+
+// 可选：去掉所有空白行压缩间距
+body = body.replace(/^\s*[\r\n]/gm, '');
 
 $done({ body });
