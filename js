@@ -1,7 +1,19 @@
-$done({
-  status: "200",
-  headers: {
-    "Content-Type": "image/png"
-  },
-  body: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAuMBgQadBvwAAAAASUVORK5CYII="
+document.addEventListener('DOMContentLoaded', function () {
+  const selectors = [
+    'img[src*="/A_PH/"]',
+    'div[class*="ad"]',
+    'div[id*="ad"]',
+  ];
+  selectors.forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      let parent = el.parentElement;
+      el.remove();
+      if (parent && parent.children.length === 0) {
+        parent.style.margin = '0';
+        parent.style.padding = '0';
+        parent.style.height = '0';
+        parent.style.lineHeight = '0';
+      }
+    });
+  });
 });
