@@ -1,5 +1,3 @@
-// 2024-10-16 11:55
-
 const url = $request.url;
 if (!$response) $done({});
 if (!$response.body) $done({});
