@@ -39,9 +39,11 @@ if (url.includes("/gw/mtop.taobao.idlemtopsearch.search.shade") || url.includes(
 }
 
 if (url.includes("/mtop.idle.user.page.my.adapter")) {
-  //  "3": tips动态提醒横幅；"6": 底部图标菜单；"5": 简历认证等小菜单；
-  const indexArr = ["3", "6"];
+  //  "3": tips动态提醒横幅；"6": 底部图标菜单；"5": 简历认证等小菜单；"4":回收横幅广告
+  const indexArr = ["3", "6", "4"];
   obj.data.container.sections = obj.data.container.sections.filter(item => !indexArr.includes(item.index));
+
+  obj.data.ability = [];
 
   //  个人等级
   obj.data.container.sections.forEach(section => {
@@ -136,7 +138,7 @@ if (url.includes("/mtop.taobao.idle.playboy.recommend")) {
 
 
 if (url.includes("/mtop.taobao.idle.item.recommend.list")) {
-    obj.data.windCard.itemList = "";
+    //obj.data.windCard.itemList = "";
     obj.data.cardList = [];
 }
 
@@ -184,6 +186,12 @@ if (url.includes("follow.recommend.feed.list")) {
   obj.data.nextPage = false;
   obj.data.fitRecommendAB = true;
 }
+
+if (url.includes("/mtop.taobao.idle.local.flow.plat.section")) {
+  const keyArr = ["fish_home_activity_enter_cardV1"];
+  obj.data.data.components = obj.data.data.components.filter(item => !keyArr.includes(item.key));
+}
+
   
 body = JSON.stringify(obj);
 $done({body});
