@@ -1,0 +1,28 @@
+// Quantumult X script-response-body 去广告脚本
+// ✅ 自动生成，适配 yximgs.com 和 i4.cn 广告接口
+// 使用 rewrite_local 配合执行
+
+const url = $request.url;
+let isAd = false;
+
+// 匹配头像广告图片
+if (/^http:\/\/p\d\.a\.yximgs\.com\/uhead\/.*_s\.jpg$/.test(url)) {
+  isAd = true;
+}
+
+// 匹配快手广告视频流
+if (/^http:\/\/tx-origin\.pull\.yximgs\.com\/gifshow\/.*\.flv/.test(url)) {
+  isAd = true;
+}
+
+// 匹配爱思助手广告打点上报接口
+if (/^https:\/\/list-app-m\.i4\.cn\/adclickcb\.xhtml$/.test(url)) {
+  isAd = true;
+}
+
+if (isAd) {
+  console.log("🚫 拦截广告资源：" + url);
+  $done({ status: 200, body: "" });
+} else {
+  $done({});
+}
