@@ -1,0 +1,9 @@
+let u = $request.url;
+let i = JSON.parse($response.body);
+if (u.includes("list-app-m.i4.cn")) {
+  i.app &amp;&amp; (i.app=[])
+}
+	i.adli &amp;&amp; (i.adli=[])
+	i.list &amp;&amp; (i.list= [])
+	i.ad &amp;&amp; (i.ad = []);
+$done({body: JSON.stringify(i)})
