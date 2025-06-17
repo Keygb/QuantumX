@@ -32,7 +32,8 @@ switch (isResp) {
         let splash = obj.data.containers.splash_home_base;
         if (splash?.base?.sections?.length > 0) {
           for (let items of splash.base.sections) {
-            if ("taobao-splash" in items.bizData) {
+            console.log(JSON.stringify(items));
+            if (typeof items.bizData === 'object' && items.bizData !== null && "taobao-splash" in items.bizData) {
               if (items?.bizData?.["taobao-splash"]?.data?.length > 0) {
                 for (let item of items.bizData["taobao-splash"].data) {
                   item.waitTime = "0";
@@ -42,7 +43,6 @@ switch (isResp) {
                   item.hideTBLogo = "false";
                   item.enable4G = "false";
                   item.coldStart = "false";
-                  item.waitTime = "0";
                   item.startTime = "3818332800000";
                   item.endTime = "3818419199000";
                   item.gmtStart = "2090-12-31 00:00:00";
@@ -92,3 +92,4 @@ switch (isResp) {
 }
 
 $done({ body });
+  
