@@ -1,0 +1,18 @@
+try {
+    const url = $request.url;
+    let body;
+
+    if (url.includes("collection/getCollectionList")) {
+        body = { returnStatus: "SUCCEED", hasMore: false, data: {} };
+    } else {
+        body = { returnStatus: "SUCCEED", hasMore: false, data: [] };
+    }
+
+    $done({
+        status: 200,
+        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" }
+    });
+} catch (e) {
+    $done();
+}
