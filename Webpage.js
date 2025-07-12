@@ -1,34 +1,86 @@
-let url = $request.url;
-let url_target = url.match(/(missav|netflav|supjav|njav|javday)/i);
-let javbus_target = url.match(/javbus/i);
+// CSS and JS resources for ad removal
+const CSS_URL = "https://limbopro.com/CSS/Adblock4limbo.user.css";
+const JS_URL = "https://limbopro.com/Adguard/Adblock4limbo.user.js";
 
-let body = $response.body;
+// HTML injection strings
+const TITLE_INJECTION = `</title>
+<link rel="stylesheet" href="${CSS_URL}" type="text/css" />
+<script type="text/javascript" async="async" src="${JS_URL}"></script>
+`;
 
-if (body) {
-    const titleRegex = /<\/title>/gi;
-    const titleInject = '</title>\
-<link rel="stylesheet" href="https://limbopro.com/CSS/Adblock4limbo.user.css" type="text/css" />\
-<script type="text/javascript" async="async" src="https://limbopro.com/Adguard/Adblock4limbo.user.js"></script>';
+const BODY_INJECTION = `
+<link rel="stylesheet" href="${CSS_URL}" type="text/css" />
+<script type="text/javascript" async="async" src="${JS_URL}"></script></body>
+`;
 
-    const bodyRegex = /<\/body>/gi;
-    const bodyInject = '<link rel="stylesheet" href="https://limbopro.com/CSS/Adblock4limbo.user.css" type="text/css" />\
-<script type="text/javascript" async="async" src="https://limbopro.com/Adguard/Adblock4limbo.user.js"></script></body>';
+// Regular expressions for URL matching
+const TARGET_SITES_REGEX = /(missav|netflav|supjav|njav|javday)/i;
+const JAVBUS_REGEX = /javbus/i;
+const HUARENLIVE_REGEX = /huaren\.live\/player\/ec\.php/i;
 
-    if (url_target) {
-        body = body.replaceAll(titleRegex, titleInject).replaceAll('window.open', '');
-    } else if (javbus_target) {
-        body = body.replaceAll(bodyRegex, bodyInject);
-    } else {
-        body = body.replaceAll(titleRegex, titleInject);
+// Regular expressions for content manipulation
+const TITLE_REGEX = /<\/title>/i;
+const BODY_REGEX = /<\/body>/i;
+const WINDOW_OPEN_REGEX = /window\.open/g;
+
+// Main function to process response
+function processResponse() {
+    const requestUrl = $request.url;
+    let responseBody = $response.body;
+
+    // Validate response body
+    if (!responseBody) {
+        console.log("Response body is null or undefined");
+        $done({ url: requestUrl });
+        return;
     }
 
-    let headers = $response.headers;
-    delete headers['Content-Security-Policy'];
-    delete headers['X-Frame-Options'];
-    delete headers['Referrer-Policy'];
-    headers['Cross-Origin-Embedder-Policy'] = 'unsafe-none';
-    headers['Cross-Origin-Opener-Policy'] = 'unsafe-none';
-    headers['Cross-Origin-Resource-Policy'] = 'cross-origin';
+    // Check URL matches
+    const isTargetSite = requestUrl.match(TARGET_SITES_REGEX);
+    const isJavbus = requestUrl.match(JAVBUS_REGEX);
+    const isHuarenlive = requestUrl.match(HUARENLIVE_REGEX);
 
-    $done({ headers, body, url });
+    // Process response body based on URL
+    if (isTargetSite) {
+        responseBody = responseBody
+            .replace(TITLE_REGEX, TITLE_INJECTION)
+            .replace(WINDOW_OPEN_REGEX, "");
+    } else if (isJavbus) {
+        responseBody = responseBody.replace(BODY_REGEX, BODY_INJECTION);
+    } else if (isHuarenlive) {
+        responseBody = responseBody
+            .replace(/"time":"20"/g, '"time":"0"')
+            //.replace(/"ads":\s*\{[^}]*\}/g, '"ads": {}')
+            .replaceAll(/"img":\s*"[^"]*"/g, '"img": ""')
+    } else {
+        responseBody = responseBody.replace(TITLE_REGEX, TITLE_INJECTION);
+    }
+
+    // Modify response headers
+    const responseHeaders = {
+        ...$response.headers,
+        "Cross-Origin-Embedder-Policy": "unsafe-none",
+        "Cross-Origin-Opener-Policy": "unsafe-none",
+        "Cross-Origin-Resource-Policy": "cross-origin"
+    };
+
+    // Remove restrictive headers
+    delete responseHeaders["Content-Security-Policy"];
+    delete responseHeaders["X-Frame-Options"];
+    delete responseHeaders["Referrer-Policy"];
+
+    // Return modified response
+    $done({
+        headers: responseHeaders,
+        body: responseBody,
+        url: requestUrl
+    });
+}
+
+// Execute main function with error handling
+try {
+    processResponse();
+} catch (error) {
+    console.log(`Error processing response: ${error.message}`);
+    $done({ url: $request.url, body: $response.body, headers: $response.headers });
 }
